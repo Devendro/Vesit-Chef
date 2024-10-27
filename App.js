@@ -10,7 +10,7 @@ import Home from './Screens/Home';
 import Login from './Screens/Login';
 import Orders from "./Screens/Orders";
 import { socket, backendSocket, SocketContext } from "./context/actions/socket";
-
+import Toast from "react-native-toast-message";
 const Stack = createNativeStackNavigator();
 export default function App() {
 
@@ -41,6 +41,7 @@ export default function App() {
               </Stack.Navigator>
             </NavigationContainer>
           </SocketContext.Provider>
+          <Toast />
         </GestureHandlerRootView>
       </PersistGate>
 

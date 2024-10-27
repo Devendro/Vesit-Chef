@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  StatusBar,
 } from "react-native";
 import {
   faEnvelope,
@@ -17,8 +18,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { login } from "../../context/actions/user";
+import { chefLogin, login } from "../../context/actions/user";
 import Toast from "react-native-toast-message";
+import LoadingOverlay from "../LoadingOverlay";
 
 const screenWidth = Dimensions.get("window").width;
 const initialColorState = {
@@ -32,7 +34,7 @@ const styles = StyleSheet.create({
   head: {
     backgroundColor: "#FFC300",
     width: screenWidth,
-    height: 245,
+    height: 225,
     justifyContent: "center",
     alignItems: "center",
     borderBottomLeftRadius: screenWidth,
@@ -115,8 +117,9 @@ const styles = StyleSheet.create({
   },
 });
 
-const Login = () => {
+const Login = ({ route }) => {
   const [inputState, setInputState] = useState(initialColorState);
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPasssword] = useState(false);
   const dispatch = useDispatch();
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -143,20 +146,32 @@ const Login = () => {
   /**
    * @description this function is used to handle the login
    */
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    setLoading(true)
     dispatch(
-      login(loginData, (res) => {
-        Toast.show({
-          type: "success",
-          text1: "Login successful",
-        });
-        navigation.navigate("Home")
+      chefLogin({ ...loginData }, (res) => {
+        setLoading(false)
+        if (!res.errors) {
+          Toast.show({
+            type: "success",
+            text1: "Login successful",
+          });
+          route?.params?.lastPage ? navigation.navigate(route?.params?.lastPage) : navigation.navigate("Orders")
+        } else {
+          Toast.show({
+            type: "error",
+            text1: "Invalid Credentials",
+          });
+        }
+
       })
     );
   };
 
   return (
     <View style={{ flex: 1, flexDirection: "column", backgroundColor: "#fff" }}>
+      <StatusBar backgroundColor="#FFC300" barStyle="dark-content" />
+      {loading && <LoadingOverlay />}
       <View style={[styles.head]}>
         <Text style={styles.headMainText}>Login</Text>
         <Text style={styles.headText}>Welcome back</Text>

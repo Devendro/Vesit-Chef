@@ -50,7 +50,7 @@ const Header = ({ title, showProfile = true }) => {
           alignItems: "center",
         }}
         onPress={() => {
-          navigation.navigate("SettingMenu");
+          navigation.navigate("Login");
         }}
       >
         <View
