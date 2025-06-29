@@ -36,20 +36,28 @@ export const updateOrderPaymentStatus = (data, callback) => {
   };
 };
 
-export const getALlOrders = (data, callback) => {
+export const getALlOrders = (queryParams = {}, callback) => {
   return (dispatch, getState) => {
     const {
       user: { token },
-    } = getState();
-    ApiClient.get(`${APIURL}${GET_ALL_ORDERS}`, data, token, dispatch).then(
-      (response) => {
-        if (response) {
-          callback(response);
-        }
+    } = getState()
+
+    // Build query string from parameters
+    const queryString = Object.keys(queryParams)
+      .filter((key) => queryParams[key] !== undefined && queryParams[key] !== "")
+      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(queryParams[key])}`)
+      .join("&")
+
+    const url = `${APIURL}${GET_ALL_ORDERS}${queryString ? `?${queryString}` : ""}`
+
+    ApiClient.get(url, {}, token, dispatch).then((response) => {
+      if (response) {
+        callback(response)
       }
-    );
-  };
-};
+    })
+  }
+}
+
 
 
 export const updateOrderStatus = (data, callback) => {
